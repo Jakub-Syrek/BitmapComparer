@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -65,6 +66,49 @@ namespace WF_imageComparer
 
         private void button3_Click(object sender, EventArgs e)
         {
+            
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            int differentPixels = 0;
+            int allPixels = 0;
+
+            var img1 = new Bitmap(filePath1);
+            var img2 = new Bitmap(filePath2);
+
+            if (img1.Width == img2.Width && img1.Height == img2.Height)
+            {
+                ParallelLoopResult X = Parallel.For(0, img1.Width, i =>
+                {
+                      lock (img1)
+                      {
+                          for (int j = 0; j < img1.Height; j++)
+                          {
+                                  if (img1.GetPixel(i, j) != img2.GetPixel(i, j))
+                                  {
+                                      differentPixels++;
+                                      break;
+                                  }
+                                  allPixels++;                           
+                          }
+                      }
+                  
+                });                
+            }
+                
+            int a = allPixels - differentPixels;
+            var b = Decimal.Divide(a, allPixels);
+            var c = b * 100;
+            var d = Decimal.Round(c, 4);
+            textBox1.AppendText($"{d} % simmilarity{Environment.NewLine}out of {allPixels} pixels {differentPixels} are different{Environment.NewLine}");
+            textBox1.AppendText($"Parallel execution in {stopwatch.Elapsed}{Environment.NewLine}");
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             int differentPixels = 0;
             int allPixels = 0;
 
@@ -73,7 +117,6 @@ namespace WF_imageComparer
 
             string img1_ref;
             string img2_ref;
-
 
             if (img1.Width == img2.Width && img1.Height == img2.Height)
             {
@@ -89,14 +132,15 @@ namespace WF_imageComparer
                             break;
                         }
                         allPixels++;
-                    }
-                    //progressBar1.Value++;
+                    }                    
                 }
             }
             int a = allPixels - differentPixels;
             var b = Decimal.Divide(a, allPixels);
             var c = b * 100;
-            textBox1.Text = $"{c} % simmilarity{Environment.NewLine}out of {allPixels} pixels {differentPixels} are different";
+            var d = Decimal.Round(c, 4);
+            textBox2.AppendText($"{d} % simmilarity{Environment.NewLine}out of {allPixels} pixels {differentPixels} are different{Environment.NewLine}");
+            textBox2.AppendText($"Sequential execution in {stopwatch.Elapsed}{Environment.NewLine}");
         }
     }
 }
