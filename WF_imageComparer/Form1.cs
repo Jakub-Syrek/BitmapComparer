@@ -139,8 +139,84 @@ namespace WF_imageComparer
             var b = Decimal.Divide(a, allPixels);
             var c = b * 100;
             var d = Decimal.Round(c, 4);
-            textBox2.AppendText($"{d} % simmilarity{Environment.NewLine}out of {allPixels} pixels {differentPixels} are different{Environment.NewLine}");
-            textBox2.AppendText($"Sequential execution in {stopwatch.Elapsed}{Environment.NewLine}");
+            textBox1.AppendText($"{d} % simmilarity{Environment.NewLine}out of {allPixels} pixels {differentPixels} are different{Environment.NewLine}");
+            textBox1.AppendText($"Sequential execution in {stopwatch.Elapsed}{Environment.NewLine}");
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            dataGridView1.ColumnCount = 0;
+            Bitmap img1 = new Bitmap(filePath1);
+            Bitmap img2 = new Bitmap(filePath2);
+
+            OutputWrapper outputWrapper = Converter.Compare(img1, img2);
+
+            var rowCountY = outputWrapper.BoolArr.GetLength(1);
+            var rowLengthX = outputWrapper.BoolArr.GetLength(0);
+
+            for (int i = 0; i < rowLengthX; i++)
+            {                
+                dataGridView1.Columns.Add($"{i}", $"{i}");
+                dataGridView1.Columns[i].Width = i.ToString().Length * 10;               
+            }
+
+            for (int i = 0; i < outputWrapper.BoolArr.GetLength(1); i++)
+            {
+                var row = new DataGridViewRow();
+
+                for (int j = 0; j < outputWrapper.BoolArr.GetLength(0); j++)
+                {
+                    row.Cells.Add(new DataGridViewTextBoxCell()
+                    {
+                        Value = Convert.ToInt16(outputWrapper.BoolArr[j, i])
+                    });
+                }
+                dataGridView1.Rows.Add(row);
+
+            }
+            dataGridView1.Refresh();            
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            var tolerance = Convert.ToInt16(comboBox1.SelectedItem);
+
+            dataGridView1.ColumnCount = 0;
+            Bitmap img1 = new Bitmap(filePath1);
+            Bitmap img2 = new Bitmap(filePath2);
+
+            OutputWrapper outputWrapper = Converter.CompareWithTolerance(img1, img2, tolerance);
+
+            var rowCountY = outputWrapper.BoolArr.GetLength(1);
+            var rowLengthX = outputWrapper.BoolArr.GetLength(0);
+
+            for (int i = 0; i < rowLengthX; i++)
+            {
+                dataGridView1.Columns.Add($"{i}", $"{i}");
+                dataGridView1.Columns[i].Width = i.ToString().Length * 10;
+            }
+
+            for (int i = 0; i < outputWrapper.BoolArr.GetLength(1); i++)
+            {
+                var row = new DataGridViewRow();
+
+                for (int j = 0; j < outputWrapper.BoolArr.GetLength(0); j++)
+                {
+                    row.Cells.Add(new DataGridViewTextBoxCell()
+                    {
+                        Value = Convert.ToInt16(outputWrapper.BoolArr[j, i])
+                    });
+                }
+                dataGridView1.Rows.Add(row);
+
+            }
+            dataGridView1.Refresh();
+            textBox1.AppendText($"Tolerance = {tolerance}{Environment.NewLine}");
+            textBox1.AppendText($"{outputWrapper.Numeric} % simmilarity{Environment.NewLine}");
+            textBox1.AppendText($"Parallel execution in {stopwatch.Elapsed}{Environment.NewLine}");
         }
     }
 }
