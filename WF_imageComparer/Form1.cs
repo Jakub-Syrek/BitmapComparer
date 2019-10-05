@@ -183,12 +183,17 @@ namespace WF_imageComparer
             stopwatch.Start();
 
             var tolerance = Convert.ToInt16(comboBox1.SelectedItem);
+            var percentageOfTruth = Convert.ToInt16(comboBox2.SelectedItem);
 
             dataGridView1.ColumnCount = 0;
             Bitmap img1 = new Bitmap(filePath1);
             Bitmap img2 = new Bitmap(filePath2);
 
-            OutputWrapper outputWrapper = Converter.CompareWithTolerance(img1, img2, tolerance);
+            OutputWrapper outputWrapper = Converter.CompareWithTolerance(
+                img1: img1,
+                img2: img2,
+                areaRadius: tolerance,
+                percentageOfTruth: percentageOfTruth);
 
             var rowCountY = outputWrapper.BoolArr.GetLength(1);
             var rowLengthX = outputWrapper.BoolArr.GetLength(0);
@@ -214,9 +219,12 @@ namespace WF_imageComparer
 
             }
             dataGridView1.Refresh();
-            textBox1.AppendText($"Tolerance = {tolerance}{Environment.NewLine}");
-            textBox1.AppendText($"{outputWrapper.Numeric} % simmilarity{Environment.NewLine}");
+            textBox1.AppendText($"Pixel radius = {tolerance} with percentage of true valued cells:{percentageOfTruth}%{Environment.NewLine}");
+            //textBox1.AppendText($"{outputWrapper.Numeric1} % simmilarity{Environment.NewLine}");
+            textBox1.AppendText($"{outputWrapper.Numeric1} % simmilarity{Environment.NewLine}out of {outputWrapper.Numeric3} pixels {outputWrapper.Numeric2} are different{Environment.NewLine}");
             textBox1.AppendText($"Parallel execution in {stopwatch.Elapsed}{Environment.NewLine}");
         }
+
+        
     }
 }

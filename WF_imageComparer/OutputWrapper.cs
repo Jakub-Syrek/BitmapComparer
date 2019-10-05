@@ -10,7 +10,9 @@ namespace WF_imageComparer
     public class OutputWrapper : IDisposable
     {
         private Bitmap _bitmap;
-        private dynamic _numeric;
+        private dynamic _numeric1;
+        private dynamic _numeric2;
+        private dynamic _numeric3;
         private bool[,] _boolArr;
         private int[,] _intArr;
 
@@ -20,10 +22,20 @@ namespace WF_imageComparer
             set { _bitmap = value; }
         }       
 
-        public dynamic Numeric
+        public dynamic Numeric1
         {
-            get { return _numeric; }
-            set { _numeric = value; }
+            get { return _numeric1; }
+            set { _numeric1 = value; }
+        }
+        public dynamic Numeric2
+        {
+            get { return _numeric2; }
+            set { _numeric2 = value; }
+        }
+        public dynamic Numeric3
+        {
+            get { return _numeric3; }
+            set { _numeric3 = value; }
         }
         public bool[,] BoolArr
         {
@@ -40,7 +52,9 @@ namespace WF_imageComparer
         {
 
             _bitmap = null;
-            _numeric = null;
+            _numeric1 = null;
+            _numeric2 = null;
+            _numeric3 = null;
             _boolArr = null;
             _intArr = null;
         }

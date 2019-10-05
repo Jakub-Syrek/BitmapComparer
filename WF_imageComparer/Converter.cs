@@ -48,13 +48,16 @@ namespace WF_imageComparer
             int a = allPixels - differentPixels;
             decimal b = Decimal.Divide(a, allPixels);
             decimal c = b * 100;
-            outputWrapper.Numeric = Decimal.Round(c, 4);
-
+            outputWrapper.Numeric1 = Decimal.Round(c, 4);
+            outputWrapper.Numeric2 = differentPixels;
+            outputWrapper.Numeric3 = allPixels;
             return outputWrapper;
         }
 
-        public static OutputWrapper CompareWithTolerance(Bitmap img1, Bitmap img2, int tolerance)
+        public static OutputWrapper CompareWithTolerance(Bitmap img1, Bitmap img2, int areaRadius, int percentageOfTruth)
         {
+            if (areaRadius == 0) areaRadius = 1;
+
             int differentPixels = 0;
             int allPixels = 0;
             OutputWrapper reducedDifferences = new OutputWrapper();            
@@ -62,24 +65,30 @@ namespace WF_imageComparer
             {
                 reducedDifferences.Bitmap = new Bitmap(img1);
                 reducedDifferences.BoolArr = new bool[originalDifferences.BoolArr.GetLength(0), originalDifferences.BoolArr.GetLength(1)];
-                ParallelLoopResult Y = Parallel.For(tolerance, originalDifferences.BoolArr.GetLength(0) - tolerance, i =>
+                ParallelLoopResult Y = Parallel.For(areaRadius, originalDifferences.BoolArr.GetLength(0) - areaRadius, i =>
                 {
-                    Parallel.For(tolerance, (originalDifferences.BoolArr.GetLength(1) - tolerance), j =>
+                    Parallel.For(areaRadius, (originalDifferences.BoolArr.GetLength(1) - areaRadius), j =>
                     {
-                        int counter = 0;
+                        int innerDifferentPixelsAggregated = 0;
+                        int innerAllPixelsAggregated = 0;
                         lock (reducedDifferences.Bitmap)
                         {
-                            Parallel.For(0 - tolerance, tolerance, k =>
+                            Parallel.For(0 - areaRadius, areaRadius, k =>
                             {
-                                for (int l = 0 - tolerance; l < tolerance; l++)
+                                for (int l = 0 - areaRadius; l < areaRadius; l++)                                
                                 {
                                     if (originalDifferences.BoolArr[i + k, j + l] == true)
                                     {
-                                        counter++;
+                                        innerDifferentPixelsAggregated++;
                                     }
+                                    innerAllPixelsAggregated++;
                                 }
                             });
-                            if (counter > tolerance)
+                            decimal areaRadiusD = areaRadius;
+                            decimal percentageOfTruthD = percentageOfTruth / 10;
+                            percentageOfTruthD = percentageOfTruthD / 10;
+                            decimal x = areaRadiusD * areaRadiusD * percentageOfTruthD;
+                            if (Convert.ToDecimal(innerDifferentPixelsAggregated) > x)
                             {
                                 differentPixels++;
                                 reducedDifferences.BoolArr[i, j] = true;
@@ -97,12 +106,48 @@ namespace WF_imageComparer
             int a = allPixels - differentPixels;
             decimal b = Decimal.Divide(a, allPixels);
             decimal c = b * 100;
-            reducedDifferences.Numeric = Decimal.Round(c, 4);
-
+            reducedDifferences.Numeric1 = Decimal.Round(c, 4);
+            reducedDifferences.Numeric2 = differentPixels;
+            reducedDifferences.Numeric3 = allPixels;
             return reducedDifferences;                   
         }
     }
 }
+
+//for (int k = 0 - areaRadius; k < areaRadius; k++)
+//{
+//    if (originalDifferences.BoolArr[i + k, j] == true)
+//    {
+//        innerDifferentPixelsAggregated++;
+//    }
+//    innerAllPixelsAggregated++;
+//}
+//for (int l = 0 - areaRadius; l < areaRadius; l++)
+//{
+//    if (originalDifferences.BoolArr[i, j + l] == true)
+//    {
+//        innerDifferentPixelsAggregated++;
+//    }
+//    innerAllPixelsAggregated++;
+//}
+//for (int m = 0 - areaRadius; m < areaRadius; m++)
+//{
+//    if (originalDifferences.BoolArr[i + m, j + m] == true)
+//    {
+//        innerDifferentPixelsAggregated++;
+//    }
+//    innerAllPixelsAggregated++;
+//}
+//for (int n = 0 - areaRadius; n < areaRadius; n++)
+//{
+//    if (originalDifferences.BoolArr[i - n, j - n] == true)
+//    {
+//        innerDifferentPixelsAggregated++;
+//    }
+//    innerAllPixelsAggregated++;
+//}
+
+
 ////for (int i = tolerance; i < originalDifferences.BoolArr.GetLength(0) - tolerance; i++)
 //ParallelLoopResult X = Parallel.For(tolerance, originalDifferences.BoolArr.GetLength(0) - tolerance, i =>
 //{
