@@ -83,13 +83,17 @@ namespace WF_imageComparer
                       lock (img1)
                       {
                           for (int j = 0; j < img1.Height; j++)
-                          {
-                                  if (img1.GetPixel(i, j) != img2.GetPixel(i, j))
-                                  {
-                                      differentPixels++;
-                                      break;
-                                  }
-                                  allPixels++;                           
+                          {                                
+                                var pixel1 = img1.GetPixel(i, j);
+                                var pixel2 = img2.GetPixel(i, j);
+                                if (!(pixel1.Equals(pixel2)))
+                                {
+                                    differentPixels++;
+                                }
+                                else
+                                {
+                                    allPixels++;
+                                }
                           }
                       }
                   
@@ -113,10 +117,7 @@ namespace WF_imageComparer
             int allPixels = 0;
 
             var img1 = new Bitmap(filePath1);
-            var img2 = new Bitmap(filePath2);
-
-            string img1_ref;
-            string img2_ref;
+            var img2 = new Bitmap(filePath2);           
 
             if (img1.Width == img2.Width && img1.Height == img2.Height)
             {
@@ -124,14 +125,18 @@ namespace WF_imageComparer
                 {
                     for (int j = 0; j < img1.Height; j++)
                     {
-                        img1_ref = img1.GetPixel(i, j).ToString();
-                        img2_ref = img2.GetPixel(i, j).ToString();
-                        if (img1_ref != img2_ref)
+                        var pixel1 = img1.GetPixel(i, j);
+                        var pixel2 = img2.GetPixel(i, j);
+
+                        if (!(pixel1.Equals(pixel2)))
                         {
                             differentPixels++;
-                            break;
+
                         }
-                        allPixels++;
+                        else
+                        {
+                            allPixels++;
+                        }
                     }                    
                 }
             }
@@ -146,10 +151,22 @@ namespace WF_imageComparer
         private void button5_Click(object sender, EventArgs e)
         {
             dataGridView1.ColumnCount = 0;
+            
             Bitmap img1 = new Bitmap(filePath1);
             Bitmap img2 = new Bitmap(filePath2);
 
-            OutputWrapper outputWrapper = Converter.Compare(img1, img2);
+            int radius = 0;
+            
+
+            if (comboBox1.SelectedItem == null)
+            {
+                radius = 1;
+            }
+            else
+            {
+                radius = Convert.ToInt32(comboBox1.SelectedItem);
+            }
+            OutputWrapper outputWrapper = Converter.Compare(img1, img2, radius);
 
             var rowCountY = outputWrapper.BoolArr.GetLength(1);
             var rowLengthX = outputWrapper.BoolArr.GetLength(0);
@@ -182,8 +199,26 @@ namespace WF_imageComparer
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            var tolerance = Convert.ToInt16(comboBox1.SelectedItem);
-            var percentageOfTruth = Convert.ToInt16(comboBox2.SelectedItem);
+            int radius = 0;
+            float percentageOfTruth = 0;            
+
+            if (comboBox1.SelectedItem == null)
+            {
+                radius = 1;
+            }
+            else
+            {
+                radius = Convert.ToInt32(comboBox1.SelectedItem);
+            }
+            if (comboBox2.SelectedItem == null)
+            {
+                percentageOfTruth = 0.01f;
+            }
+            else
+            {
+                percentageOfTruth = float.Parse(comboBox2.SelectedItem.ToString());
+            }
+            
 
             dataGridView1.ColumnCount = 0;
             Bitmap img1 = new Bitmap(filePath1);
@@ -192,8 +227,12 @@ namespace WF_imageComparer
             OutputWrapper outputWrapper = Converter.CompareWithTolerance(
                 img1: img1,
                 img2: img2,
-                areaRadius: tolerance,
-                percentageOfTruth: percentageOfTruth);
+                areaRadius: radius,
+                percentageOfTruth: percentageOfTruth /100);
+
+
+            pictureBox3.Image = outputWrapper.Bitmap;
+
 
             var rowCountY = outputWrapper.BoolArr.GetLength(1);
             var rowLengthX = outputWrapper.BoolArr.GetLength(0);
@@ -219,9 +258,21 @@ namespace WF_imageComparer
 
             }
             dataGridView1.Refresh();
-            textBox1.AppendText($"Pixel radius = {tolerance} with percentage of true valued cells:{percentageOfTruth}%{Environment.NewLine}");
+            textBox1.AppendText($"Pixel radius = {radius} with percentage of true valued cells:{percentageOfTruth}%{Environment.NewLine}");
             //textBox1.AppendText($"{outputWrapper.Numeric1} % simmilarity{Environment.NewLine}");
-            textBox1.AppendText($"{outputWrapper.Numeric1} % simmilarity{Environment.NewLine}out of {outputWrapper.Numeric3} pixels {outputWrapper.Numeric2} are different{Environment.NewLine}");
+            textBox1.AppendText($"{outputWrapper.Percentage} % simmilarity{Environment.NewLine}out of {outputWrapper.AllPixels} pixels {outputWrapper.DifferentPixels} are different{Environment.NewLine}");
+            //textBox1.AppendText($"{outputWrapper.Colors.Count} different colors detected in picture{Environment.NewLine}");
+            
+            //outputWrapper.ColorsSorted = Converter.ReturnSortedColors(outputWrapper).ColorsSorted;
+            //outputWrapper.ColorsSorted = OutputWrapper.ReturnSortedColors(outputWrapper).ColorsSorted;
+            //outputWrapper = new ConverterDependency().ReturnSortedColors(outputWrapper);
+           
+            //foreach (var item in outputWrapper.ColorsSorted)
+            //{                
+            //    textBox1.AppendText($"{item}{Environment.NewLine}");
+            //}
+
+
             textBox1.AppendText($"Parallel execution in {stopwatch.Elapsed}{Environment.NewLine}");
         }
 
