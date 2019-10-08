@@ -276,6 +276,25 @@ namespace WF_imageComparer
             textBox1.AppendText($"Parallel execution in {stopwatch.Elapsed}{Environment.NewLine}");
         }
 
-        
+        private void button7_Click(object sender, EventArgs e)
+        {
+            using (Image image1 = new Bitmap(pictureBox1.Image))
+            using (Image image2 = new Bitmap(pictureBox2.Image))
+            using (Image image3 = new Bitmap(pictureBox3.Image))
+            {
+                List<Image> images = new List<Image>();
+                images.Add(image1);
+                images.Add(image2);
+                images.Add(image3);
+
+                string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string outputPath = $"{appDataPath}\\output.jpg";
+
+                Converter.MergeImages(image1, image2,  outputPath , image3);
+                Converter.MergeImagesList(images, outputPath, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                images.Dispose();
+            }
+        }
     }
 }
