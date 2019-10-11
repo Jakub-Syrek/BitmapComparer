@@ -48,6 +48,7 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.button7 = new System.Windows.Forms.Button();
+            this.button8 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -95,7 +96,7 @@
             // 
             // pictureBox2
             // 
-            this.pictureBox2.Image = global::WF_imageComparer.Properties.Resources.test2;
+            this.pictureBox2.Image = global::WF_imageComparer.Properties.Resources.test4;
             this.pictureBox2.Location = new System.Drawing.Point(1040, 52);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(229, 283);
@@ -207,7 +208,6 @@
             // 
             // pictureBox3
             // 
-            this.pictureBox3.Image = global::WF_imageComparer.Properties.Resources.test1;
             this.pictureBox3.Location = new System.Drawing.Point(778, 52);
             this.pictureBox3.Name = "pictureBox3";
             this.pictureBox3.Size = new System.Drawing.Size(229, 283);
@@ -261,11 +261,22 @@
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
+            // button8
+            // 
+            this.button8.Location = new System.Drawing.Point(566, 405);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(189, 23);
+            this.button8.TabIndex = 21;
+            this.button8.Text = "TestComparingMethod";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1365, 469);
+            this.Controls.Add(this.button8);
             this.Controls.Add(this.button7);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
@@ -319,6 +330,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.Button button8;
     }
 }
 

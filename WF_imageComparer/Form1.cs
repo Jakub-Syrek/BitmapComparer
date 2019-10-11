@@ -1,16 +1,10 @@
-﻿using Leadtools;
-using Leadtools.Codecs;
-using Leadtools.ImageProcessing.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
 
 namespace WF_imageComparer
 {
@@ -22,6 +16,9 @@ namespace WF_imageComparer
         public Form1()
         {
             InitializeComponent();
+            //var x = WF_imageComparer.Properties.Resources.Annotation_2019_07_08_200408;
+
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -30,7 +27,7 @@ namespace WF_imageComparer
 
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.InitialDirectory = @"C:\Users\jaqbs\source\repos\WF_imageComparer\WF_imageComparer\Bitmaps";
+                openFileDialog.InitialDirectory = @"C:\Users\jaqbs\source\repos\WF_imageComparer\WF_imageComparer\Resources";
                 openFileDialog.Filter = "bmp files (*.bmp)|*.bmp"; //|All files (*.*)|*.*";
                 openFileDialog.FilterIndex = 2;
                 openFileDialog.RestoreDirectory = true;
@@ -50,7 +47,7 @@ namespace WF_imageComparer
 
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.InitialDirectory = @"C:\Users\jaqbs\source\repos\WF_imageComparer\WF_imageComparer\Bitmaps";
+                openFileDialog.InitialDirectory = @"C:\Users\jaqbs\source\repos\WF_imageComparer\WF_imageComparer\Resources";
                 openFileDialog.Filter = "bmp files (*.bmp)|*.bmp"; //|All files (*.*)|*.*";
                 openFileDialog.FilterIndex = 2;
                 openFileDialog.RestoreDirectory = true;
@@ -166,7 +163,7 @@ namespace WF_imageComparer
             {
                 radius = Convert.ToInt32(comboBox1.SelectedItem);
             }
-            OutputWrapper outputWrapper = Converter.Compare(img1, img2, radius);
+            OutputWrapper outputWrapper = ConverterImg.Compare(img1, img2, radius);
 
             var rowCountY = outputWrapper.BoolArr.GetLength(1);
             var rowLengthX = outputWrapper.BoolArr.GetLength(0);
@@ -224,7 +221,7 @@ namespace WF_imageComparer
             Bitmap img1 = new Bitmap(filePath1);
             Bitmap img2 = new Bitmap(filePath2);
 
-            OutputWrapper outputWrapper = Converter.CompareWithTolerance(
+            OutputWrapper outputWrapper = ConverterImg.CompareWithTolerance(
                 img1: img1,
                 img2: img2,
                 areaRadius: radius,
@@ -290,11 +287,22 @@ namespace WF_imageComparer
                 string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 string outputPath = $"{appDataPath}\\output.jpg";
 
-                Converter.MergeImages(image1, image2,  outputPath , image3);
-                Converter.MergeImagesList(images, outputPath, System.Drawing.Imaging.ImageFormat.Jpeg);
-
+                ConverterImg.MergeImages(image1, image2,  outputPath , image3);
+                ConverterImg.MergeImagesList(images, outputPath, System.Drawing.Imaging.ImageFormat.Jpeg);                
+               
                 images.Dispose();
             }
+        }
+
+
+        
+
+        private  void button8_Click(object sender, EventArgs e)
+        {            
+            var x = global::WF_imageComparer.Properties.Resources.test1;
+            var y = global::WF_imageComparer.Properties.Resources.test4;
+            var result = Task<OutputWrapper>.Run(async () => await UnitTestProject1.UnitTest12.TestMethodAsync(x, y));
+            textBox1.AppendText((result.Result.Percentage > 50) ? "test passed" : "test failed");
         }
     }
 }
