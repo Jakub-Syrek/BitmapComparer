@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Resources;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using WF_imageComparer.Properties;
 
 namespace WF_imageComparer
 {
@@ -294,7 +296,6 @@ namespace WF_imageComparer
             }
         }
 
-
         
 
         private  void button8_Click(object sender, EventArgs e)
@@ -303,6 +304,74 @@ namespace WF_imageComparer
             var y = global::WF_imageComparer.Properties.Resources.test4;
             var result = Task<OutputWrapper>.Run(async () => await UnitTestProject1.UnitTest12.TestMethodAsync(x, y));
             textBox1.AppendText((result.Result.Percentage > 50) ? "test passed" : "test failed");
+        }
+
+
+
+        public async static Task<byte[]> ImageToByteAsync(Image img)
+        {
+           var subtask = Task<byte[]>.Run(() =>
+           {
+               using (var stream = new MemoryStream())
+               {
+                   img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                   return stream.ToArray();
+               }
+           });
+           return await subtask;
+        }
+        public async static Task<Bitmap> ByteToImageAsync(byte[] byteArr)
+        {
+           var subtask = Task<Bitmap>.Run(() =>
+           {
+              using (var stream = new MemoryStream(byteArr))
+              {
+                return new Bitmap(stream);
+              }
+           });
+            return await subtask;
+        }
+        private async void button9_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!(pictureBox3.Image.Equals(null)))
+                {
+                    ResXResourceWriter resX = new ResXResourceWriter(Resources.ResourceManager.BaseName);
+                    byte[] _byteArr = await ImageToByteAsync(pictureBox3.Image);
+                    resX.AddResource("resource1", _byteArr);
+                    resX.Generate();
+                    resX.Close();
+                    resX.Dispose();
+                    resX = null;
+                }
+                textBox1.AppendText($"pic added to Resources{Environment.NewLine}");
+            }
+            catch (Exception exc)
+            {
+                textBox1.AppendText($"pic not added to res => {exc.ToString()}{Environment.NewLine}");               
+            }            
+        }
+        private async void button10_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ResXResourceSet resX = new ResXResourceSet(Resources.ResourceManager.BaseName);
+                byte[] _byteArr = (byte[])resX.GetObject("resource1");
+                if (!(_byteArr.Equals(null)))
+                {
+                    Bitmap bitmap = await ByteToImageAsync(_byteArr);
+                    pictureBox1.Image = bitmap;
+                    textBox1.AppendText($"res added to picBox{Environment.NewLine}");
+                }
+                resX.Close();
+                resX.Dispose();
+                resX = null;
+            }
+            catch (Exception exc)
+            {
+                textBox1.AppendText($"res not added to pic => {exc.ToString()}{Environment.NewLine}");
+            }            
         }
     }
 }
